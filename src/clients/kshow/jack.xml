@@ -1,0 +1,30 @@
+<!DOCTYPE patchbay>
+<patchbay version="0.3.7" name="jack">
+ <output-sockets>
+  <socket exclusive="off" client="audacious-jack_[0-9]+_[0-9]+" type="audio" name="audacious">
+   <plug>out_0</plug>
+   <plug>out_1</plug>
+  </socket>
+  <socket exclusive="off" client="system" type="audio" name="system_in">
+    <plug>capture_1</plug>
+    <plug>capture_2</plug>
+  </socket>
+ </output-sockets>
+ <input-sockets>
+  <socket exclusive="off" client="leitshow" type="audio" name="leitshow">
+   <plug>left_input</plug>
+  </socket>
+  <socket exclusive="off" client="system" type="audio" name="system_out">
+    <plug>playback_1</plug>
+    <plug>playback_2</plug>
+  </socket>
+ </input-sockets>
+ <slots/>
+ <cables>
+  <cable output="audacious" input="leitshow"/>
+  <cable output="audacious" input="system_out"/>
+  <cable output="system_in" input="leitshow"/>
+  <cable output="system_in" input="system_out"/>  
+ </cables>
+</patchbay>
+
