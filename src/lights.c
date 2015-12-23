@@ -7,13 +7,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/select.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+
+#ifdef __WIN32__
+
+# include <winsock2.h>
+//TODO THIS IS WRONG
+#define MSG_DONTWAIT 0
+
+#else
+
+# include <sys/socket.h>
+# include <sys/select.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <netdb.h>
+
+#endif
+
 #include <time.h>
 #include <errno.h>
 
@@ -122,7 +135,7 @@ int sqlights_light_initialize(char * routeraddr) {
   servaddr.sin_port = htons(SQ_PORT);
   try(NULL != (host = gethostbyname(routeraddr)),
       "Invalid host name");
-  bcopy(host->h_addr, &servaddr.sin_addr, host->h_length);
+  memmove(&servaddr.sin_addr, host->h_addr, host->h_length);
   ack_next = time(NULL) + ACK_DELAY;
   reack_next = time(NULL) + REACK_DELAY;
   return 0;
@@ -367,7 +380,7 @@ int sqlights_client_initialize(char * routeraddr) {
   clservaddr.sin_port = htons(SQ_PORT);
   try(NULL != (host = gethostbyname(routeraddr)),
       "Invalid host name");
-  bcopy(host->h_addr, &clservaddr.sin_addr, host->h_length);
+  memmove(&clservaddr.sin_addr, host->h_addr, host->h_length);
   return 0;
 }
 

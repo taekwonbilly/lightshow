@@ -1,15 +1,17 @@
 CC=gcc
-LIBS=-lm -llo -ljack -lfftw3
+#LIBS=-lm -ljack -lfftw3
+#LIBS=-lm -llo -ljack -lfftw3
+LIBS=-lm -llo -ljack -lfftw3 -lws2_32
 CFLAGS=-Wall -I include -std=gnu99 -ggdb
 TARGETS=
 
 router: src/lights.o src/router.o
 	mkdir -p build/
-	$(CC) $(LIBS) src/lights.o src/router.o -o build/router
+	$(CC) src/lights.o src/router.o $(LIBS) -o build/router
 
 testlight: src/lights/testlight.o src/lights.o
 	mkdir -p build/lights
-	$(CC) $(LIBS) src/lights.o src/lights/testlight.o -o build/lights/testlight
+	$(CC) src/lights.o src/lights/testlight.o $(LIBS) -o build/lights/testlight
 
 osc: src/clients/osc.o src/lights.o
 	mkdir -p build/clients

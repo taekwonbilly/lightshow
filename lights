@@ -7,10 +7,10 @@ SQL=/home/honig/squidlights2/build
 function start() {
     TEST=$1
     CMD=$2
-    if ! (ps -A | grep $TEST > /dev/null); then
+    if ! (ps -a | grep $TEST > /dev/null); then
 	echo "Starting $TEST"
 	eval "$CMD &> /dev/null &"
-	if ! (ps -A | grep $TEST > /dev/null); then
+	if ! (ps -a | grep $TEST > /dev/null); then
 	    echo "Failed starting $TEST" 1>&2
 	    exit 1
 	fi
@@ -42,7 +42,7 @@ function mrun() {
 
 mrun qjackctl "qjackctl -s"
 
-if [ ! `pidof jackd` ]; then
+if [ ! `pgrep jackd` ]; then
     if [ "$ACTION" == "start" ]; then
 	sleep 10
     fi

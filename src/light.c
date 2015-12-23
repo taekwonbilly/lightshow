@@ -41,7 +41,7 @@ int main(int argc, char *argv) {
     exit(1);
   }
 
-  bcopy(host->h_addr, &servaddr.sin_addr, host->h_length);
+  memmove(&servaddr.sin_addr, host->h_addr, host->h_length);
 
   printf("Sending packet\n");
   sprintf(buffer, "I'm a client");

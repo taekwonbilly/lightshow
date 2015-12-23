@@ -8,10 +8,24 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/select.h>
+
+
+#ifdef __WIN32__
+
+# include <winsock2.h>
+//TODO THIS IS WRONG
+#define MSG_DONTWAIT 0
+
+#else
+
+# include <sys/socket.h>
+# include <sys/select.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <netdb.h>
+
+#endif
+
 #include <time.h>
 #include <errno.h>
 
@@ -168,7 +182,7 @@ static struct sockaddr_in servaddr;
 void sq_serv_init(void) {
   try(0 <= (servsock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)),
       "Failed to create udp socket");
-  int on = 1;
+  const char on = 1;
   setsockopt(servsock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 
   memset(&servaddr, 0, sizeof(servaddr));
@@ -197,9 +211,8 @@ void sq_serv_handle(void) {
   FD_SET(servsock, &fds);
   select(servsock+1, &fds, NULL, NULL, &tv);
   
-  unsigned int clientlen = sizeof(clientaddr);
-  recvlen = recvfrom(servsock, msg, BUFSIZE, MSG_DONTWAIT,
-		     (struct sockaddr *)&clientaddr, &clientlen);
+  int clientlen = sizeof(clientaddr);
+  recvlen = recvfrom(servsock, msg, BUFSIZE, MSG_DONTWAIT, (struct sockaddr *)&clientaddr, &clientlen);
   if(recvlen < 0) {
     if(errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
       return;
