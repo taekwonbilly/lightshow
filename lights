@@ -1,0 +1,57 @@
+#!/bin/bash
+
+ACTION=$1
+
+SQL=/home/honig/squidlights2/build
+
+function start() {
+    TEST=$1
+    CMD=$2
+    if ! (ps -A | grep $TEST > /dev/null); then
+	echo "Starting $TEST"
+	eval "$CMD &> /dev/null &"
+	if ! (ps -A | grep $TEST > /dev/null); then
+	    echo "Failed starting $TEST" 1>&2
+	    exit 1
+	fi
+    fi
+}
+
+function stop() {
+    TEST=$1
+    CMD=$2
+    echo "Stopping $TEST"
+    killall $TEST 2> /dev/null
+}
+
+function mrun() {
+    case "$ACTION" in
+	start)
+	    start $1 $2
+	    ;;
+	stop)
+	    stop $1 $2
+	    ;;
+	*)
+	    echo "Usage: lights (start|stop)"
+	    exit 22
+	    ;;
+    esac
+}
+
+
+mrun qjackctl "qjackctl -s"
+
+if [ ! `pidof jackd` ]; then
+    if [ "$ACTION" == "start" ]; then
+	sleep 10
+    fi
+fi
+mrun router $SQL/router
+mrun elmolights $SQL/lights/elmolights
+cd $SQL/lights
+mrun yeoldelights "./yeoldelights"
+mrun kshow $SQL/clients/kshow
+if [ "$ACTION" == "stop" ]; then
+    $SQL/lights/elmolights localhost kill
+fi
